@@ -8,8 +8,7 @@ Repository for playing with Docker and Semantic MediaWiki
 * {{MW legacy release number}} - {{MW legacy branch number}}
 * {{MW legacy lts release number}} - {{MW legacy lts branch number}}
 
-* Retrieve via: http://www.mediawiki.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=Template:MW%20stable%20release%20number
-
+* Retrive via: https://www.mediawiki.org/api/rest_v1/page/summary/Template%3AMW%20stable%20release%20number
 
 # Semantic MediaWiki versions
 
