@@ -1,0 +1,2 @@
+#  Local configuration for MediaWiki
+

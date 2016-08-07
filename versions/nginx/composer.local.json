@@ -1,0 +1,6 @@
+{
+	"require": {
+		"mediawiki/semantic-media-wiki": "~2.4"
+	}
+
+}
