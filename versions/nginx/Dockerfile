@@ -58,5 +58,21 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 
 COPY composer.local.json /usr/src/mediawiki
 
+RUN cd /usr/src/mediawiki; php maintenance/install.php \
+	    --dbname $DBNAME \
+	    --dbpass $DBPASS \
+	    --dbserver $DBSERVER \
+	    --dbtype mysql \
+		--dbprefix $DBPREFIX
+	    --dbuser $DBUSER \
+	    --email mediawiki@localhost \
+	    --installdbpass $DBPASS \
+	    --installdbuser $DBUSER \
+	    --pass $USERPASS \
+	    --scriptpath $SCRIPTPATH \
+		--lang $WIKILANG
+	$WIKINAME $WIKIUSER
+
+
 RUN cd /usr/src/mediawiki; composer update --no-dev;
 
