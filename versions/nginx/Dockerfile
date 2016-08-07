@@ -11,7 +11,7 @@ RUN set -x; \
 
 RUN set -x; \
 	apt-get update && \
-	apt-get install -y nginx php7.0 php7.0-fpm php7.0-gd php7.0-mysql php7.0-cli php7.0-common php7.0-curl php7.0-opcache php7.0-json php7.0-intl \
+	apt-get install -y nginx php7.0 php7.0-fpm php7.0-gd php7.0-mysql php7.0-cli php7.0-common php7.0-curl php7.0-opcache php7.0-json php7.0-intl php7.0-mbstring php7.0-xml \
 	libfreetype6-dev \
 	libjpeg62-turbo-dev \
 	libmcrypt-dev \
@@ -55,4 +55,8 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 	&& curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig \
 	&& gpg --verify mediawiki.tar.gz.sig \
 	&& tar -xf mediawiki.tar.gz -C /usr/src/mediawiki --strip-components=1
+
+COPY composer.local.json /usr/src/mediawiki
+
+RUN cd /usr/src/mediawiki; composer update --no-dev;
 
