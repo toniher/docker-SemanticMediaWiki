@@ -34,7 +34,8 @@ RUN set -x; \
 	git \
 	subversion \
 	unzip \
-	wget
+	wget \
+	supervisor
 
 RUN set -x; \
 	rm -rf /var/lib/apt/lists/*
@@ -60,17 +61,17 @@ RUN gpg --keyserver pool.sks-keyservers.net --recv-keys \
 
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
 	set -x; \
-	mkdir -p /usr/src/mediawiki \
+	mkdir -p /var/www/w \
 	&& curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
 	&& curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig \
 	&& gpg --verify mediawiki.tar.gz.sig \
-	&& tar -xf mediawiki.tar.gz -C /usr/src/mediawiki --strip-components=1
+	&& tar -xf mediawiki.tar.gz -C /var/www/w --strip-components=1
 
-COPY composer.local.json /usr/src/mediawiki
+COPY composer.local.json /var/www/w
 
 RUN set -x; echo "${MYSQL_HOST}"
 
-RUN cd /usr/src/mediawiki; php maintenance/install.php \
+RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
 		--dbserver "$MYSQL_HOST" \
@@ -86,7 +87,13 @@ RUN cd /usr/src/mediawiki; php maintenance/install.php \
 	"$MW_WIKINAME" "$MW_WIKIUSER"
 
 
-RUN cd /usr/src/mediawiki; composer update --no-dev;
+RUN cd /var/www/w; composer update --no-dev;
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
+
+# Starting processes
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+CMD ["/usr/bin/supervisord"]
+
 
