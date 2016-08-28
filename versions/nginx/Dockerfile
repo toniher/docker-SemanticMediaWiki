@@ -88,3 +88,5 @@ RUN cd /usr/src/mediawiki; php maintenance/install.php \
 
 RUN cd /usr/src/mediawiki; composer update --no-dev;
 
+COPY nginx-default.conf /etc/nginx/conf.d/default.conf
+
