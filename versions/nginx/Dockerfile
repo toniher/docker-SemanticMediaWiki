@@ -2,7 +2,17 @@ FROM nginx:1.10
 
 # To be changed here
 ENV MEDIAWIKI_VERSION 1.27
-ENV MEDIAWIKI_FULL_VERSION 1.27.0
+ENV MEDIAWIKI_FULL_VERSION 1.27.1
+ARG MYSQL_DATABASE=mediawiki
+ARG MYSQL_USER=mediawiki
+ARG MYSQL_PASSWORD=mediawiki
+ARG MYSQL_HOST=127.0.0.1
+ARG MYSQL_PREFIX=mw_
+ARG MW_PASSWORD=prova
+ARG MW_SCRIPTPATH=/W
+ARG MW_WIKILANG=en
+ARG MW_WIKINAME=MyWiki
+ARG MW_WIKIUSER=WikiSysop
 
 RUN set -x; \
 	gpg --keyserver keys.gnupg.net --recv-key 89DF5277 \
@@ -58,20 +68,22 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 
 COPY composer.local.json /usr/src/mediawiki
 
+RUN set -x; echo "${MYSQL_HOST}"
+
 RUN cd /usr/src/mediawiki; php maintenance/install.php \
-	    --dbname $DBNAME \
-	    --dbpass $DBPASS \
-	    --dbserver $DBSERVER \
-	    --dbtype mysql \
-		--dbprefix $DBPREFIX
-	    --dbuser $DBUSER \
-	    --email mediawiki@localhost \
-	    --installdbpass $DBPASS \
-	    --installdbuser $DBUSER \
-	    --pass $USERPASS \
-	    --scriptpath $SCRIPTPATH \
-		--lang $WIKILANG
-	$WIKINAME $WIKIUSER
+		--dbname "$MYSQL_DATABASE" \
+		--dbpass "$MYSQL_PASSWORD" \
+		--dbserver "$MYSQL_HOST" \
+		--dbtype mysql \
+		--dbprefix "$MYSQL_PREFIX" \
+		--dbuser "$MYSQL_USER" \
+		--email mediawiki@localhost \
+		--installdbpass "$MYSQL_PASSWORD" \
+		--installdbuser "$MYSQL_USER" \
+		--pass "$MW_PASSWORD" \
+		--scriptpath "$MW_SCRIPTPATH" \
+		--lang "$MW_WIKILANG" \
+	"$MW_WIKINAME" "$MW_WIKIUSER"
 
 
 RUN cd /usr/src/mediawiki; composer update --no-dev;

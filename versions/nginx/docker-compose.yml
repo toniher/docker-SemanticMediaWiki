@@ -10,16 +10,24 @@ services:
       MYSQL_DATABASE: mediawiki
       MYSQL_USER: mediawiki
       MYSQL_PASSWORD: mediawiki
-
-  wordpress:
+  smw:
     depends_on:
       - db
-    image: semantic-nginx:latest
+    build: .
     links:
       - db
     ports:
       - "8000:80"
     restart: always
     environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_PASSWORD: mediawiki
+      MYSQL_HOST: db:3306
+      MYSQL_PASSWORD: mediawiki
+      MYSQL_DATABASE: mediawiki
+      MYSQL_PREFIX: mw_
+      MYSQL_USER: mediawiki
+      MYSQL_PASSWORD: mediwaiki
+      MW_PASSWORD: mediawiki
+      MW_SCRIPTPATH: w
+      MW_WIKILANG: en
+      MW_WIKINAME: MediaWiki
+      MW_WIKIUSER: WikiSysop
