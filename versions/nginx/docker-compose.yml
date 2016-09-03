@@ -1,33 +1,33 @@
 version: '2'
 services:
-  db:
-    image: mariadb:10.1
-    volumes:
-      - "./.data/db:/var/lib/mysql"
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: mediawiki
-      MYSQL_DATABASE: mediawiki
-      MYSQL_USER: mediawiki
-      MYSQL_PASSWORD: mediawiki
-  smw:
-    depends_on:
-      - db
-    build: .
-    links:
-      - db
-    ports:
-      - "8000:80"
-    restart: always
-    environment:
-      MYSQL_HOST: db:3306
-      MYSQL_PASSWORD: mediawiki
-      MYSQL_DATABASE: mediawiki
-      MYSQL_PREFIX: mw_
-      MYSQL_USER: mediawiki
-      MYSQL_PASSWORD: mediwaiki
-      MW_PASSWORD: mediawiki
-      MW_SCRIPTPATH: w
-      MW_WIKILANG: en
-      MW_WIKINAME: MediaWiki
-      MW_WIKIUSER: WikiSysop
+    db:
+        image: mariadb:10.1
+        volumes:
+            - "./.data/db:/var/lib/mysql"
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: mediawiki
+            MYSQL_DATABASE: mediawiki
+            MYSQL_USER: mediawiki
+            MYSQL_PASSWORD: mediawiki
+    smw:
+        depends_on:
+            - db
+        build:
+            context: .
+            args:
+                MYSQL_HOST: db:3306
+                MYSQL_DATABASE: mediawiki
+                MYSQL_PREFIX: mw_
+                MYSQL_USER: mediawiki
+                MYSQL_PASSWORD: mediwaiki
+                MW_PASSWORD: mediawiki
+                MW_SCRIPTPATH: /w
+                MW_WIKILANG: en
+                MW_WIKINAME: MyWiki
+                MW_WIKIUSER: WikiSysop
+        links:
+            - db
+        ports:
+            - "8000:80"
+        restart: always
