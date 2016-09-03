@@ -13,6 +13,8 @@ services:
     smw:
         depends_on:
             - db
+        links:
+            - db
         build:
             context: .
             args:
@@ -26,8 +28,6 @@ services:
                 MW_WIKILANG: en
                 MW_WIKINAME: MyWiki
                 MW_WIKIUSER: WikiSysop
-        links:
-            - db
         ports:
             - "8000:80"
         restart: always

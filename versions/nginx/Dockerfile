@@ -15,7 +15,7 @@ ARG MW_WIKINAME=Test
 ARG MW_WIKIUSER=WikiSysop
 
 RUN set -x; \
-	gpg --keyserver keys.gnupg.net --recv-key 89DF5277 \
+	gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 89DF5277 \
 	&& gpg -a --export 89DF5277 | apt-key add - \
 	&& echo "deb http://packages.dotdeb.org jessie all" > /etc/apt/sources.list.d/dotdeb.list
 
@@ -51,7 +51,7 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
 RUN php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --version=1.2.0 && rm -rf /tmp/composer-setup.php
 
 # https://www.mediawiki.org/keys/keys.txt
-RUN gpg --keyserver pool.sks-keyservers.net --recv-keys \
+RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
 	441276E9CCD15F44F6D97D18C119E1A64D70938E \
 	41B2ABE817ADD3E52BDA946F72BC1C5D23107F8A \
 	162432D9E81C1C618B301EECEE1F663462D84F01 \
@@ -69,7 +69,7 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 
 COPY composer.local.json /var/www/w
 
-RUN set -x; echo "${MYSQL_HOST}"
+RUN set -x; echo "Host is ${MYSQL_HOST}"
 
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
