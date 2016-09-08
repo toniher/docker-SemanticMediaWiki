@@ -14,11 +14,10 @@ services:
         depends_on:
             - db
         links:
-            - db
+            - db:db
         build:
             context: .
             args:
-                MYSQL_HOST: db:3306
                 MYSQL_DATABASE: mediawiki
                 MYSQL_PREFIX: mw_
                 MYSQL_USER: mediawiki

@@ -6,13 +6,14 @@ ENV MEDIAWIKI_FULL_VERSION 1.27.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
 ARG MYSQL_PASSWORD=mediawiki
-ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_PREFIX=mw_
 ARG MW_PASSWORD=prova
 ARG MW_SCRIPTPATH=/w
 ARG MW_WIKILANG=en
 ARG MW_WIKINAME=Test
 ARG MW_WIKIUSER=WikiSysop
+
+RUN SET -x; echo $MEDIAWIKI_FULL_VERSION
 
 RUN set -x; \
 	gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 89DF5277 \
@@ -69,12 +70,14 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 
 COPY composer.local.json /var/www/w
 
-RUN set -x; echo "Host is ${MYSQL_HOST}"
+RUN set -x; echo $MYSQL_HOST >> /tmp/startpath; cat /tmp/startpath
+
+RUN set -x; echo "Host is $MYSQL_HOST"
 
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
-		--dbserver "$MYSQL_HOST" \
+		--dbserver db \
 		--dbtype mysql \
 		--dbprefix "$MYSQL_PREFIX" \
 		--dbuser "$MYSQL_USER" \
