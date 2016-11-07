@@ -92,11 +92,17 @@ RUN cd /var/www/w; php maintenance/install.php \
 
 RUN cd /var/www/w; composer update --no-dev;
 
-# TODO Include domain name in enableSemantics
-# TODO adding LocalSettings.local.php as well
+COPY LocalSettings.local.php /var/www/w
+
+# Addding extra stuff to LocalSettings
+RUN echo $'\n\
+enableSemantics( "$DOMAIN_NAME" ); \n\
+require_once( "$IP/LocalSettings.local.php" ); \n' >> /var/www/w/LocalSettings.php
+
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
-# TODO Adding domain name in nginx 
+# Adding extra domain name
+RUN sed -i 's/localhost/localhost $DOMAIN_NAME/' /etc/nginx/conf.d/default.conf
 
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
