@@ -1,8 +1,8 @@
 FROM nginx:1.10
 
-# To be changed here
-ENV MEDIAWIKI_VERSION 1.27
-ENV MEDIAWIKI_FULL_VERSION 1.27.1
+ARG MEDIAWIKI_VERSION 1.27
+ARG MEDIAWIKI_FULL_VERSION 1.27.1
+ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
 ARG MYSQL_PASSWORD=mediawiki
@@ -77,11 +77,11 @@ RUN set -x; echo "Host is $MYSQL_HOST"
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
-		--dbserver db \
+		--dbserver "$MYSQL_HOST" \
 		--dbtype mysql \
 		--dbprefix "$MYSQL_PREFIX" \
 		--dbuser "$MYSQL_USER" \
-		--email mediawiki@localhost \
+		--email "MW_EMAIL" \
 		--installdbpass "$MYSQL_PASSWORD" \
 		--installdbuser "$MYSQL_USER" \
 		--pass "$MW_PASSWORD" \
@@ -92,7 +92,11 @@ RUN cd /var/www/w; php maintenance/install.php \
 
 RUN cd /var/www/w; composer update --no-dev;
 
+# TODO Include domain name in enableSemantics
+# TODO adding LocalSettings.local.php as well
+
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
+# TODO Adding domain name in nginx 
 
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
