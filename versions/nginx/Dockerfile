@@ -90,14 +90,21 @@ RUN cd /var/www/w; php maintenance/install.php \
 	"$MW_WIKINAME" "$MW_WIKIUSER"
 
 
-RUN cd /var/www/w; composer update --no-dev;
 
 COPY LocalSettings.local.php /var/www/w
 
 # Addding extra stuff to LocalSettings
 RUN echo $'\n\
 enableSemantics( "$DOMAIN_NAME" ); \n\
-require_once( "$IP/LocalSettings.local.php" ); \n' >> /var/www/w/LocalSettings.php
+include_once "$IP/LocalSettings.local.php"; \n' >> /var/www/w/LocalSettings.php
+
+RUN cd /var/www/w; composer update --no-dev;
+
+php maintenance/update.php
+
+# Update Semantic MediaWiki
+php extensions/SemanticMediaWiki/maintenance/rebuildData.php -ftpv
+php extensions/SemanticMediaWiki/maintenance/rebuildData.php -v
 
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
