@@ -12,8 +12,7 @@ ARG MW_SCRIPTPATH=/w
 ARG MW_WIKILANG=en
 ARG MW_WIKINAME=Test
 ARG MW_WIKIUSER=WikiSysop
-
-RUN SET -x; echo $MEDIAWIKI_FULL_VERSION
+ARG DOMAIN_NAME=localhost
 
 RUN set -x; \
 	gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 89DF5277 \
@@ -21,8 +20,8 @@ RUN set -x; \
 	&& echo "deb http://packages.dotdeb.org jessie all" > /etc/apt/sources.list.d/dotdeb.list
 
 RUN set -x; \
-	apt-get update && \
-	apt-get install -y nginx php7.0 php7.0-fpm php7.0-gd php7.0-mysql php7.0-cli php7.0-common php7.0-curl php7.0-opcache php7.0-json php7.0-intl php7.0-mbstring php7.0-xml \
+	apt-get update && apt-get upgrade; \
+	apt-get install -y php7.0 php7.0-fpm php7.0-gd php7.0-mysql php7.0-cli php7.0-common php7.0-curl php7.0-opcache php7.0-json php7.0-intl php7.0-mbstring php7.0-xml \
 	libfreetype6-dev \
 	libjpeg62-turbo-dev \
 	libmcrypt-dev \
@@ -94,17 +93,17 @@ RUN cd /var/www/w; php maintenance/install.php \
 COPY LocalSettings.local.php /var/www/w
 
 # Addding extra stuff to LocalSettings
-RUN echo $'\n\
-enableSemantics( "$DOMAIN_NAME" ); \n\
-include_once "$IP/LocalSettings.local.php"; \n' >> /var/www/w/LocalSettings.php
+RUN echo '\n\
+enableSemantics( "$DOMAIN_NAME" );\n\
+include_once "$IP/LocalSettings.local.php"; ' >> /var/www/w/LocalSettings.php
 
 RUN cd /var/www/w; composer update --no-dev;
 
-php maintenance/update.php
+RUN cd /var/www/w; php maintenance/update.php
 
 # Update Semantic MediaWiki
-php extensions/SemanticMediaWiki/maintenance/rebuildData.php -ftpv
-php extensions/SemanticMediaWiki/maintenance/rebuildData.php -v
+RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -ftpv
+RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -v
 
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
