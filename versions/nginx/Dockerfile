@@ -51,7 +51,6 @@ RUN cd /var/www/w; php maintenance/install.php \
 		--pass "$MW_PASSWORD" \
 		--scriptpath "$MW_SCRIPTPATH" \
 		--lang "$MW_WIKILANG" \
-		--email "$MW_EMAIL" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}"
 
 
