@@ -42,17 +42,16 @@ RUN set -x; echo "Host is $MYSQL_HOST"
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
-		--dbserver "${MYSQL_HOST}" \
+		--dbserver "$MYSQL_HOST" \
 		--dbtype mysql \
 		--dbprefix "$MYSQL_PREFIX" \
 		--dbuser "$MYSQL_USER" \
-		--email "${MW_EMAIL}" \
 		--installdbpass "$MYSQL_PASSWORD" \
 		--installdbuser "$MYSQL_USER" \
 		--pass "$MW_PASSWORD" \
 		--scriptpath "$MW_SCRIPTPATH" \
 		--lang "$MW_WIKILANG" \
-		--server "${PROTOCOL}${DOMAIN_NAME}" \
+		--email "$MW_EMAIL" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}"
 
 
@@ -60,9 +59,9 @@ RUN cd /var/www/w; php maintenance/install.php \
 COPY LocalSettings.local.php /var/www/w
 
 # Addding extra stuff to LocalSettings
-RUN echo '\n\
-enableSemantics( "${DOMAIN_NAME}" );\n\
-include_once "$IP/LocalSettings.local.php"; ' >> /var/www/w/LocalSettings.php
+RUN echo "\n\
+enableSemantics( '${DOMAIN_NAME}' );\n\
+include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php
 
 RUN cd /var/www/w; composer update --no-dev;
 
@@ -75,7 +74,7 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
 # Adding extra domain name
-RUN sed -i 's/localhost/localhost $DOMAIN_NAME/' /etc/nginx/conf.d/default.conf
+RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
