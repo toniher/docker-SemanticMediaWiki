@@ -14,6 +14,7 @@ ARG MW_WIKINAME=Test
 ARG MW_WIKIUSER=WikiSysop
 ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
+ARG PROTOCOL=http://
 
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
@@ -41,17 +42,18 @@ RUN set -x; echo "Host is $MYSQL_HOST"
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
-		--dbserver "$MYSQL_HOST" \
+		--dbserver "${MYSQL_HOST}" \
 		--dbtype mysql \
 		--dbprefix "$MYSQL_PREFIX" \
 		--dbuser "$MYSQL_USER" \
-		--email "MW_EMAIL" \
+		--email "${MW_EMAIL}" \
 		--installdbpass "$MYSQL_PASSWORD" \
 		--installdbuser "$MYSQL_USER" \
 		--pass "$MW_PASSWORD" \
 		--scriptpath "$MW_SCRIPTPATH" \
 		--lang "$MW_WIKILANG" \
-	"$MW_WIKINAME" "$MW_WIKIUSER"
+		--server "${PROTOCOL}${DOMAIN_NAME}" \
+"${MW_WIKINAME}" "${MW_WIKIUSER}"
 
 
 
@@ -59,7 +61,7 @@ COPY LocalSettings.local.php /var/www/w
 
 # Addding extra stuff to LocalSettings
 RUN echo '\n\
-enableSemantics( "$DOMAIN_NAME" );\n\
+enableSemantics( "${DOMAIN_NAME}" );\n\
 include_once "$IP/LocalSettings.local.php"; ' >> /var/www/w/LocalSettings.php
 
 RUN cd /var/www/w; composer update --no-dev;
