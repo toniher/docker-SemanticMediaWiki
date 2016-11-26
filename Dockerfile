@@ -16,6 +16,8 @@ ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
+#Start 
+
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
 	441276E9CCD15F44F6D97D18C119E1A64D70938E \
@@ -64,12 +66,15 @@ include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php
 
 RUN cd /var/www/w; composer update --no-dev;
 
+RUN chown -R www-data:www-data /var/www/w
+
 RUN cd /var/www/w; php maintenance/update.php
 
 # Update Semantic MediaWiki
 RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -ftpv
 RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -v
 
+RUN cd /var/www/w; php maintenance/runJobs.php
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
 # Adding extra domain name
