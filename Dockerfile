@@ -16,8 +16,6 @@ ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
-#Start 
-
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
 	441276E9CCD15F44F6D97D18C119E1A64D70938E \
@@ -41,6 +39,18 @@ RUN set -x; echo $MYSQL_HOST >> /tmp/startpath; cat /tmp/startpath
 
 RUN set -x; echo "Host is $MYSQL_HOST"
 
+COPY nginx-default.conf /etc/nginx/conf.d/default.conf
+# Adding extra domain name
+RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
+
+# Starting processes
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+COPY LocalSettings.local.php /var/www/w
+
+# Forcing Invalidate cache
+ARG CACHE_INSTALL=2016-11-01
+
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
@@ -55,9 +65,6 @@ RUN cd /var/www/w; php maintenance/install.php \
 		--lang "$MW_WIKILANG" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}"
 
-
-
-COPY LocalSettings.local.php /var/www/w
 
 # Addding extra stuff to LocalSettings
 RUN echo "\n\
@@ -76,12 +83,6 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
-COPY nginx-default.conf /etc/nginx/conf.d/default.conf
-# Adding extra domain name
-RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
-
-# Starting processes
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 CMD ["/usr/bin/supervisord"]
 
