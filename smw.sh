@@ -18,7 +18,7 @@ docker run --name db -e MYSQL_ROOT_PASSWORD=mediawiki -e MYSQL_DATABASE=mediawik
 
 MARIADB_HOST=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' db`
 
-CACHE_INSTALL=`date +%Y-%m-%d`
+CACHE_INSTALL=`date +%Y-%m-%d-%H-%M`
 
 echo $MARIADB_HOST
 echo $CACHE_INSTALL
