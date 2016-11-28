@@ -1,7 +1,7 @@
 FROM toniher/nginx-php:latest
 
-ARG MEDIAWIKI_VERSION=1.27
-ARG MEDIAWIKI_FULL_VERSION=1.27.1
+ARG MEDIAWIKI_VERSION=1.23
+ARG MEDIAWIKI_FULL_VERSION=1.23.15
 ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
@@ -33,7 +33,7 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 	&& gpg --verify mediawiki.tar.gz.sig \
 	&& tar -xf mediawiki.tar.gz -C /var/www/w --strip-components=1
 
-COPY composer.local.json /var/www/w
+COPY composer.json /var/www/w
 
 RUN set -x; echo $MYSQL_HOST >> /tmp/startpath; cat /tmp/startpath
 

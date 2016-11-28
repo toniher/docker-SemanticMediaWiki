@@ -1,7 +1,7 @@
 #!/bin/sh
 
-MEDIAWIKI_VERSION=1.27
-MEDIAWIKI_FULL_VERSION=1.27.1
+MEDIAWIKI_VERSION=1.23
+MEDIAWIKI_FULL_VERSION=1.23.15
 DOMAIN_NAME=mywiki
 MYSQL_DATABASE=mediawiki
 MYSQL_USER=mediawiki
@@ -18,7 +18,7 @@ docker run --name db -e MYSQL_ROOT_PASSWORD=mediawiki -e MYSQL_DATABASE=mediawik
 
 MARIADB_HOST=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' db`
 
-CACHE_INSTALL=`date +%Y-%m-%d`
+CACHE_INSTALL=`date +%Y-%m-%d-%H-%M`
 
 echo $MARIADB_HOST
 echo $CACHE_INSTALL
