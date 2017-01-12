@@ -1,4 +1,4 @@
-FROM toniher/nginx-php:latest
+FROM toniher/nginx-php:raspbian
 
 ARG MEDIAWIKI_VERSION=1.27
 ARG MEDIAWIKI_FULL_VERSION=1.27.1
