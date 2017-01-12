@@ -15,8 +15,8 @@ MW_WIKIUSER=WikiSysop
 MW_EMAIL=i@mywiki.com
 PORT=10080
 
-docker pull rpi-mariadb:latest
-docker run --name db -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD -e MYSQL_DATABASE=$MYSQL_DATABASE -e MYSQL_USER=$MYSQL_USER -e MYSQL_PASSWORD=$MYSQL_PASSWORD -v $(pwd)/data/db:/var/lib/mysql -v $(pwd)/mariadb-custom.cnf:/etc/mysql/conf.d/custom.cnf -p 4306:3306 -d rpi-mariadb:latest
+docker pull toniher/rpi-mariadb:latest
+docker run --name db -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD -e MYSQL_DATABASE=$MYSQL_DATABASE -e MYSQL_USER=$MYSQL_USER -e MYSQL_PASSWORD=$MYSQL_PASSWORD -v $(pwd)/data/db:/var/lib/mysql -v $(pwd)/mariadb-custom.cnf:/etc/mysql/conf.d/custom.cnf -p 4306:3306 -d toniher/rpi-mariadb:latest
 
 MARIADB_HOST=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' db`
 
