@@ -1,4 +1,4 @@
-Repository for playing with Docker and Semantic MediaWiki
+Repository for playing with Docker and Semantic MediaWiki  [![Build Status](https://travis-ci.org/toniher/docker-SemanticMediaWiki.svg?branch=master)](https://travis-ci.org/toniher/docker-SemanticMediaWiki)
 
 * Parameters are stored in smw.sh script.
 * A MariaDB and a NGINX based PHP images are created.
