@@ -1,0 +1,9 @@
+sudo: required
+services:
+- docker
+language: bash
+script:
+- ./smw.sh
+
+
+
