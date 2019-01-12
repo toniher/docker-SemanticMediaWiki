@@ -1,4 +1,4 @@
-FROM toniher/nginx-php:jessie
+FROM toniher/nginx-php:nginx-1.10
 
 ARG MEDIAWIKI_VERSION=1.27
 ARG MEDIAWIKI_FULL_VERSION=1.27.5
