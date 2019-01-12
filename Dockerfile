@@ -16,10 +16,14 @@ ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
-RUN apt-get install -y gpg
+RUN set -x; \
+        apt-get update && apt-get upgrade; \
+	apt-get install -y gpg
+RUN set -x; \
+        rm -rf /var/lib/apt/lists/*
 
 # https://www.mediawiki.org/keys/keys.txt
-RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
+RUN gpg --no-tty --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
 	441276E9CCD15F44F6D97D18C119E1A64D70938E \
 	41B2ABE817ADD3E52BDA946F72BC1C5D23107F8A \
 	162432D9E81C1C618B301EECEE1F663462D84F01 \
