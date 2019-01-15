@@ -17,10 +17,11 @@ ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
 RUN set -x; \
-        apt-get update && apt-get upgrade; \
-	apt-get install -y gpg
+    apt-get update && apt-get -y upgrade;
 RUN set -x; \
-        rm -rf /var/lib/apt/lists/*
+    apt-get install -y gnupg;
+RUN set -x; \
+    rm -rf /var/lib/apt/lists/*
 
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --no-tty --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
