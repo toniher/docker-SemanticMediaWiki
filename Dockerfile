@@ -17,8 +17,9 @@ ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
 RUN set -x; \
-    apt-get update && apt-get -y upgrade; \
-    apt-get install -y gpg;
+    apt-get update && apt-get -y upgrade;
+RUN set -x; \
+    apt-get install -y gnupg;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
