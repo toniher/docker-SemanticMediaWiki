@@ -5,3 +5,5 @@ Repository for playing with Docker and Semantic MediaWiki  [![Build Status](http
 * bash smw.sh for building images and starting the process.
 * bash smw-start.sh for starting processes once images are created.
 
+Different branches provide different version combinations
+
