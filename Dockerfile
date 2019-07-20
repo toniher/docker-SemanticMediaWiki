@@ -3,6 +3,7 @@ FROM toniher/nginx-php:nginx-1.14-php-7.0
 ARG MEDIAWIKI_VERSION=1.31
 ARG MEDIAWIKI_FULL_VERSION=1.31.3
 ARG DB_CONTAINER=db
+ARG PARSOID_CONTAINER=parsoid
 ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
@@ -73,6 +74,10 @@ RUN cd /var/www/w; php maintenance/install.php \
 		--lang "$MW_WIKILANG" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}"
 
+# VisualEditor extension
+RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r 's/\./_/g') && curl -s -o /tmp/extension-visualeditor.tar.gz https://extdist.wmflabs.org/dist/extensions/VisualEditor-REL$ENVEXT-`curl -s https://extdist.wmflabs.org/dist/extensions/ | grep -o -P "(?<=VisualEditor-REL$ENVEXT-)[0-9a-z]{7}(?=.tar.gz)" | head -1`.tar.gz && \
+    tar -xzf /tmp/extension-visualeditor.tar.gz -C  /var/www/w/extensions && \
+    rm /tmp/extension-visualeditor.tar.gz
 
 # Addding extra stuff to LocalSettings
 RUN echo "\n\
@@ -94,6 +99,7 @@ RUN cd /var/www/w; php maintenance/runJobs.php
 RUN mkdir -p /run/php
 
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
+
 
 CMD ["/usr/bin/supervisord"]
 
