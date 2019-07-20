@@ -2,6 +2,7 @@ FROM toniher/nginx-php:nginx-1.14-php-7.0
 
 ARG MEDIAWIKI_VERSION=1.31
 ARG MEDIAWIKI_FULL_VERSION=1.31.3
+ARG DB_CONTAINER=db
 ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
@@ -91,6 +92,8 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
 RUN mkdir -p /run/php
+
+RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
 
 CMD ["/usr/bin/supervisord"]
 
