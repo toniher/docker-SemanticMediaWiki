@@ -12,6 +12,9 @@ wfLoadExtension('WikiEditor');
 
 $wgArticlePath = "/wiki/$1";
 
+wfLoadExtension( 'CodeEditor' );
+$wgDefaultUserOptions['usebetatoolbar'] = 1; // user option provided by WikiEditor extension
+
 wfLoadExtension('VisualEditor');
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
 $wgVirtualRestConfig['modules']['parsoid'] = array(
