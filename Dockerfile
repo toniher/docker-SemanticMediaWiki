@@ -1,7 +1,7 @@
-FROM toniher/nginx-php:nginx-1.10
+FROM toniher/nginx-php:nginx-1.14-php-7.0
 
-ARG MEDIAWIKI_VERSION=1.27
-ARG MEDIAWIKI_FULL_VERSION=1.27.5
+ARG MEDIAWIKI_VERSION=1.31
+ARG MEDIAWIKI_FULL_VERSION=1.31.3
 ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
@@ -16,8 +16,15 @@ ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
+RUN set -x; \
+    apt-get update && apt-get -y upgrade;
+RUN set -x; \
+    apt-get install -y gnupg;
+RUN set -x; \
+    rm -rf /var/lib/apt/lists/*
+
 # https://www.mediawiki.org/keys/keys.txt
-RUN gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
+RUN gpg --no-tty --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
 	441276E9CCD15F44F6D97D18C119E1A64D70938E \
 	41B2ABE817ADD3E52BDA946F72BC1C5D23107F8A \
 	162432D9E81C1C618B301EECEE1F663462D84F01 \
@@ -83,6 +90,7 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
+RUN mkdir -p /run/php
 
 CMD ["/usr/bin/supervisord"]
 
