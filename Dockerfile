@@ -100,6 +100,8 @@ RUN mkdir -p /run/php
 
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
 
+# VOLUME image
+VOLUME /var/www/w/images
 
 CMD ["/usr/bin/supervisord"]
 
