@@ -90,6 +90,7 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
+RUN mkdir -p /run/php
 
 CMD ["/usr/bin/supervisord"]
 
