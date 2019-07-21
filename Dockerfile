@@ -77,7 +77,7 @@ RUN cd /var/www/w; php maintenance/install.php \
 COPY download-extension.sh /usr/local/bin/
 
 # VisualEditor extension
-RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r 's/\./_/g') && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
+RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
 # Addding extra stuff to LocalSettings
 RUN echo "\n\
