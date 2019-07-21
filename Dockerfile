@@ -21,7 +21,7 @@ ARG PROTOCOL=http://
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg;
+    apt-get install -y gnupg jq;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
@@ -74,10 +74,10 @@ RUN cd /var/www/w; php maintenance/install.php \
 		--lang "$MW_WIKILANG" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}"
 
+COPY download-extension.sh /usr/local/bin/
+
 # VisualEditor extension
-RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r 's/\./_/g') && curl -s -o /tmp/extension-visualeditor.tar.gz https://extdist.wmflabs.org/dist/extensions/VisualEditor-REL$ENVEXT-`curl -s https://extdist.wmflabs.org/dist/extensions/ | grep -o -P "(?<=VisualEditor-REL$ENVEXT-)[0-9a-z]{7}(?=.tar.gz)" | head -1`.tar.gz && \
-    tar -xzf /tmp/extension-visualeditor.tar.gz -C  /var/www/w/extensions && \
-    rm /tmp/extension-visualeditor.tar.gz
+RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r 's/\./_/g') && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
 # Addding extra stuff to LocalSettings
 RUN echo "\n\
