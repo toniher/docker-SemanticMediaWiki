@@ -19,7 +19,7 @@ ARG PROTOCOL=http://
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
 
-RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
+RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-${MEDIAWIKI_FULL_VERSION}.tar.gz"; \
 	set -x; \
 	mkdir -p /var/www/w \
 	&& curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
@@ -79,5 +79,3 @@ RUN cd /var/www/w; php maintenance/runJobs.php
 
 
 CMD ["/usr/bin/supervisord"]
-
-
