@@ -21,7 +21,7 @@ ARG PROTOCOL=http://
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg jq;
+    apt-get install -y gnupg jq php-redis;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 

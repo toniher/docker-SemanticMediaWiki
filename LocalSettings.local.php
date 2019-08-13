@@ -24,3 +24,14 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 );
 $wgSessionsInObjectCache = true;
 $wgVirtualRestConfig['modules']['parsoid']['forwardCookies'] = true;
+
+$wgMainCacheType = 'redis';
+$wgSessionCacheType = 'redis';
+
+$wgJobTypeConf['default'] = [
+    'class'          => 'JobQueueRedis',
+    'redisServer'    => 'redis:6379',
+    'redisConfig'    => [],
+    'claimTTL'       => 3600,
+    'daemonized'     => true
+ ];
