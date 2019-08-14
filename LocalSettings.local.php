@@ -25,6 +25,11 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 $wgSessionsInObjectCache = true;
 $wgVirtualRestConfig['modules']['parsoid']['forwardCookies'] = true;
 
+$wgObjectCaches['redis'] = [
+    'class'                => 'RedisBagOStuff',
+    'servers'              => [ 'redis:6379' ]
+];
+
 $wgMainCacheType = 'redis';
 $wgSessionCacheType = 'redis';
 
