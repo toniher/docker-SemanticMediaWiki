@@ -2,8 +2,6 @@
 
 source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
 
-docker run --net=$NETWORK --name $REDIS_CONTAINER -d redis:$REDIS_TAG
-
 docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images --name $WIKI_CONTAINER --network-alias=$DOMAIN_NAME -d smw
 
 docker run --net=$NETWORK --name $PARSOID_CONTAINER -d -p 8142:8000 \
