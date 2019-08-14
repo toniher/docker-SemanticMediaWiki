@@ -17,7 +17,9 @@ ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
 # https://www.mediawiki.org/keys/keys.txt
-RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
+RUN curl -fSL "http://www.mediawiki.org/keys/keys.txt" -o keys.txt
+RUN gpg --no-tty --import "keys.txt"
+RUN rm -f keys.txt
 
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
 	set -x; \
