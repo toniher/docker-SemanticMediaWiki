@@ -18,6 +18,9 @@ ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
 
+# Forcing Invalidate cache
+ARG CACHE_INSTALL=2016-11-01
+
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
@@ -50,9 +53,6 @@ RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY LocalSettings.local.php /var/www/w
-
-# Forcing Invalidate cache
-ARG CACHE_INSTALL=2016-11-01
 
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
@@ -93,6 +93,11 @@ RUN cd /var/www/w; php maintenance/runJobs.php
 RUN mkdir -p /run/php
 
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
+
+# Redis configuration
+COPY LocalSettings.redis.php /var/www/w
+RUN echo "\n\
+include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php
 
 # VOLUME image
 VOLUME /var/www/w/images
