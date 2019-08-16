@@ -16,6 +16,8 @@ ARG MW_WIKIUSER=WikiSysop
 ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
+# Forcing Invalidate cache
+ARG CACHE_INSTALL=2016-11-01
 
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
@@ -42,9 +44,6 @@ RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY LocalSettings.local.php /var/www/w
-
-# Forcing Invalidate cache
-ARG CACHE_INSTALL=2016-11-01
 
 RUN cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
