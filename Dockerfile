@@ -1,8 +1,9 @@
-FROM toniher/nginx-php:nginx-1.14-php-7.0
+FROM toniher/nginx-php:nginx-1.16-php-7.3
 
 ARG MEDIAWIKI_VERSION=1.31
-ARG MEDIAWIKI_FULL_VERSION=1.31.3
+ARG MEDIAWIKI_FULL_VERSION=1.31.6
 ARG DB_CONTAINER=db
+ARG PARSOID_CONTAINER=parsoid
 ARG MYSQL_HOST=127.0.0.1
 ARG MYSQL_DATABASE=mediawiki
 ARG MYSQL_USER=mediawiki
@@ -19,10 +20,13 @@ ARG PROTOCOL=http://
 # Forcing Invalidate cache
 ARG CACHE_INSTALL=2016-11-01
 
+# Forcing Invalidate cache
+ARG CACHE_INSTALL=2016-11-01
+
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg;
+    apt-get install -y gnupg jq php-redis;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
@@ -66,6 +70,10 @@ RUN cd /var/www/w; php maintenance/install.php \
 		--lang "$MW_WIKILANG" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}"
 
+COPY download-extension.sh /usr/local/bin/
+
+# VisualEditor extension
+RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
 # Addding extra stuff to LocalSettings
 RUN echo "\n\
@@ -87,6 +95,14 @@ RUN cd /var/www/w; php maintenance/runJobs.php
 RUN mkdir -p /run/php
 
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
+
+# Redis configuration
+COPY LocalSettings.redis.php /var/www/w
+RUN echo "\n\
+include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php
+
+# VOLUME image
+VOLUME /var/www/w/images
 
 CMD ["/usr/bin/supervisord"]
 
