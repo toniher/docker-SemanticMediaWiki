@@ -2,7 +2,7 @@
 
 source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
 
-docker network create $NETWORK
+docker network create $NETWORK --subnet $NETWORK_SUBNET
 
 bash smw-start-db.sh
 
