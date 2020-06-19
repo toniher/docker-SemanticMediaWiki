@@ -6,7 +6,7 @@ echo "Running wiki"
 
 LOCALSETTINGS_MOUNT=""
 
-if ["$MW_NEW" != true ]; then 
+if [ ! $MW_NEW ]; then 
 	LOCALSETTINGS_MOUNT="-v ${CONF_PATH}/LocalSettings.php:/var/www/w/LocalSettings.php"
 fi
 
