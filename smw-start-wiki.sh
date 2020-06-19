@@ -4,7 +4,16 @@ source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
 
 echo "Running wiki"
 
-docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images --name $WIKI_CONTAINER --network-alias=$DOMAIN_NAME -d $WIKI_IMAGE
+LOCALSETTINGS_MOUNT=""
+
+if ["$MW_NEW" != "true" ]; then 
+	LOCALSETTINGS_MOUNT="-v ${CONF_PATH}/LocalSettings.php:/var/www/w/LocalSettings.php"
+fi
+
+docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images \
+${LOCALSETTINGS_MOUNT} -v ${CONF_PATH}/LocalSettings.local.php:/var/www/w/LocalSettings.local.php -v ${CONF_PATH}/LocalSettings.redis.php:/var/www/w/LocalSettings.redis.php \
+--name $WIKI_CONTAINER --network-alias=$DOMAIN_NAME -d $WIKI_IMAGE
+
 
 echo "Running parsoid"
 

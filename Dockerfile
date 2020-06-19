@@ -72,8 +72,8 @@ COPY download-extension.sh /usr/local/bin/
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
-# This to be turned into VOLUME
-COPY LocalSettings.local.php /var/www/w
+# Volume LocalSettings.local.php
+VOLUME /var/www/w/LocalSettings.local.php
 
 # Addding extra stuff to LocalSettings. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
@@ -97,8 +97,8 @@ RUN mkdir -p /run/php
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
 
 # Redis configuration
-# This to be turned into VOLUME
-COPY LocalSettings.redis.php /var/www/w
+# Volume LocalSettings.redis.php
+VOLUME /var/www/w/LocalSettings.redis.php
 
 # Adding redis config. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ;  then echo "\n\
