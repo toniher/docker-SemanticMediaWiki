@@ -34,6 +34,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy helpers
 COPY download-extension.sh /usr/local/bin/
+COPY download-extension-git.sh /usr/local/bin/
 
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
 # Adding extra domain name
