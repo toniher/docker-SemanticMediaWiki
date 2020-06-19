@@ -32,6 +32,18 @@ RUN set -x; \
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
 
+# Starting processes
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy helpers
+COPY download-extension.sh /usr/local/bin/
+
+COPY nginx-default.conf /etc/nginx/conf.d/default.conf
+# Adding extra domain name
+RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
+
+USER www-data
+
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
 	set -x; \
 	mkdir -p /var/www/w \
@@ -42,16 +54,7 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 
 COPY composer.local.json /var/www/w
 
-RUN set -x; echo $MYSQL_HOST >> /tmp/startpath; cat /tmp/startpath
-
 RUN set -x; echo "Host is $MYSQL_HOST"
-
-COPY nginx-default.conf /etc/nginx/conf.d/default.conf
-# Adding extra domain name
-RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
-
-# Starting processes
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
@@ -67,8 +70,6 @@ RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php 
 		--lang "$MW_WIKILANG" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}" ; fi
 
-COPY download-extension.sh /usr/local/bin/
-
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
@@ -82,7 +83,7 @@ include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php
 
 RUN cd /var/www/w; composer update --no-dev;
 
-RUN chown -R www-data:www-data /var/www/w
+#RUN chown -R www-data:www-data /var/www/w
 
 RUN cd /var/www/w; php maintenance/update.php
 
@@ -106,6 +107,8 @@ include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php
 
 # VOLUME image
 VOLUME /var/www/w/images
+
+USER root
 
 CMD ["/usr/bin/supervisord"]
 
