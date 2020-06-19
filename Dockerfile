@@ -46,7 +46,7 @@ RUN mkdir -p /var/www/w; chown www-data:www-data /var/www/w
 USER www-data
 
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
-	set -x; \
+	set -x; true \
 	&& curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
 	&& curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig \
 	&& gpg --verify mediawiki.tar.gz.sig \
