@@ -6,7 +6,7 @@ echo "Running wiki"
 
 LOCALSETTINGS_MOUNT=""
 
-if ["$MW_NEW" != "true" ]; then 
+if ["$MW_NEW" != true ]; then 
 	LOCALSETTINGS_MOUNT="-v ${CONF_PATH}/LocalSettings.php:/var/www/w/LocalSettings.php"
 fi
 
@@ -26,5 +26,4 @@ docker run --net=$NETWORK --name $PARSOID_CONTAINER -d -p 8142:8000 \
 # Maintenance tasks wiki
 docker exec $WIKI_CONTAINER php /var/www/w/maintenance/update.php
 docker exec $WIKI_CONTAINER php /var/www/w/maintenance/runJobs.php
-
 
