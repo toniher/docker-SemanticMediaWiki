@@ -52,6 +52,7 @@ RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# This to be turned into VOLUME
 COPY LocalSettings.local.php /var/www/w
 
 RUN cd /var/www/w; php maintenance/install.php \
@@ -95,6 +96,7 @@ RUN mkdir -p /run/php
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
 
 # Redis configuration
+# This to be turned into VOLUME
 COPY LocalSettings.redis.php /var/www/w
 RUN echo "\n\
 include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php

@@ -3,7 +3,7 @@
 source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
 
 # Moving this outside in case needed
-MARIADB_HOST=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' $MARIADB_CONTAINER`
+MARIADB_HOST=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' $DB_CONTAINER`
 CACHE_INSTALL=`date +%Y-%m-%d-%H-%M`
 
 echo $MARIADB_HOST

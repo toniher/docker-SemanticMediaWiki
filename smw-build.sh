@@ -8,7 +8,7 @@ bash smw-start-db.sh
 
 bash smw-build-wiki.sh
 
-docker network connect $NETWORK $MARIADB_CONTAINER
+docker network connect $NETWORK $DB_CONTAINER
 
 bash smw-start-wiki.sh
 
