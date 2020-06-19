@@ -95,15 +95,11 @@ RUN cd /var/www/w; php maintenance/runJobs.php
 
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
 
-# Volume LocalSettings.local.php
-VOLUME /var/www/w/LocalSettings.local.php
+# File LocalSettings.local.php
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
 include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php ; fi
 
 # Redis configuration
-# Volume LocalSettings.redis.php
-VOLUME /var/www/w/LocalSettings.redis.php
-
 # Adding redis config. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ;  then echo "\n\
 include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php ; fi
