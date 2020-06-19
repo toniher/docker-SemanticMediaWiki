@@ -45,12 +45,15 @@ RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 RUN mkdir -p /var/www/w; chown www-data:www-data /var/www/w
 USER www-data
 
+WORKDIR /tmp
+
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
-	set -x; true \
-	&& curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
+	set -x; \
+	curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
 	&& curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig \
 	&& gpg --verify mediawiki.tar.gz.sig \
-	&& tar -xf mediawiki.tar.gz -C /var/www/w --strip-components=1
+	&& tar -xf mediawiki.tar.gz -C /var/www/w --strip-components=1 \
+	&& rm -f mediawiki*
 
 COPY composer.local.json /var/www/w
 
@@ -107,6 +110,8 @@ include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php
 
 # VOLUME image
 VOLUME /var/www/w/images
+
+WORKDIR /var/www/w
 
 USER root
 
