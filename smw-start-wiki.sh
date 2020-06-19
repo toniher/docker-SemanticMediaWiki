@@ -23,3 +23,4 @@ docker run --net=$NETWORK --name $PARSOID_CONTAINER -d -p 8142:8000 \
         -e PARSOID_DOMAIN_localhost=http://$DOMAIN_NAME/w/api.php \
         thenets/parsoid:$PARSOID_TAG
 
+# TODO Maintenance tasks wiki

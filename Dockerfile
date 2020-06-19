@@ -78,17 +78,12 @@ RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php 
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
-# Volume LocalSettings.local.php
-VOLUME /var/www/w/LocalSettings.local.php
 
 # Addding extra stuff to LocalSettings. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
-enableSemantics( '${DOMAIN_NAME}' );\n\
-include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php ; fi
+enableSemantics( '${DOMAIN_NAME}' );\n >> /var/www/w/LocalSettings.php ; fi
 
 RUN cd /var/www/w; composer update --no-dev;
-
-#RUN chown -R www-data:www-data /var/www/w
 
 RUN cd /var/www/w; php maintenance/update.php
 
@@ -98,9 +93,12 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
-RUN mkdir -p /run/php
-
 RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
+
+# Volume LocalSettings.local.php
+VOLUME /var/www/w/LocalSettings.local.php
+RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
+include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php ; fi
 
 # Redis configuration
 # Volume LocalSettings.redis.php
@@ -116,6 +114,7 @@ VOLUME /var/www/w/images
 WORKDIR /var/www/w
 
 USER root
+RUN mkdir -p /run/php
 
 CMD ["/usr/bin/supervisord"]
 
