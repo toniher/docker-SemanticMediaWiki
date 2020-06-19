@@ -17,6 +17,7 @@ ARG MW_WIKIUSER=WikiSysop
 ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
 ARG PROTOCOL=http://
+ARG MW_NEW=true
 
 # Forcing Invalidate cache
 ARG CACHE_INSTALL=2020-06-19
@@ -52,10 +53,7 @@ RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# This to be turned into VOLUME
-COPY LocalSettings.local.php /var/www/w
-
-RUN cd /var/www/w; php maintenance/install.php \
+RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php \
 		--dbname "$MYSQL_DATABASE" \
 		--dbpass "$MYSQL_PASSWORD" \
 		--dbserver "$MYSQL_HOST" \
@@ -67,17 +65,20 @@ RUN cd /var/www/w; php maintenance/install.php \
 		--pass "$MW_PASSWORD" \
 		--scriptpath "$MW_SCRIPTPATH" \
 		--lang "$MW_WIKILANG" \
-"${MW_WIKINAME}" "${MW_WIKIUSER}"
+"${MW_WIKINAME}" "${MW_WIKIUSER}" ; fi
 
 COPY download-extension.sh /usr/local/bin/
 
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
-# Addding extra stuff to LocalSettings
-RUN echo "\n\
+# This to be turned into VOLUME
+COPY LocalSettings.local.php /var/www/w
+
+# Addding extra stuff to LocalSettings. Only if new installation
+RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
 enableSemantics( '${DOMAIN_NAME}' );\n\
-include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php
+include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php ; fi
 
 RUN cd /var/www/w; composer update --no-dev;
 
@@ -98,8 +99,10 @@ RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php
 # Redis configuration
 # This to be turned into VOLUME
 COPY LocalSettings.redis.php /var/www/w
-RUN echo "\n\
-include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php
+
+# Adding redis config. Only if new installation
+RUN if [ "$MW_NEW" = "true" ] ;  then echo "\n\
+include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php ; fi
 
 # VOLUME image
 VOLUME /var/www/w/images
