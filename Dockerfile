@@ -29,9 +29,6 @@ RUN set -x; \
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
-# https://www.mediawiki.org/keys/keys.txt
-RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
-
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
@@ -46,6 +43,9 @@ RUN mkdir -p /var/www/w; chown www-data:www-data /var/www/w
 USER www-data
 
 WORKDIR /tmp
+
+# https://www.mediawiki.org/keys/keys.txt
+RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
 
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
 	set -x; \
