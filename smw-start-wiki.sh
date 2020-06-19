@@ -4,7 +4,7 @@ source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
 
 echo "Running wiki"
 
-docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images --name $WIKI_CONTAINER --network-alias=$DOMAIN_NAME -d smw
+docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images --name $WIKI_CONTAINER --network-alias=$DOMAIN_NAME -d $WIKI_IMAGE
 
 echo "Running parsoid"
 
