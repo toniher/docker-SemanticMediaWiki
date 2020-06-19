@@ -44,6 +44,8 @@ USER www-data
 
 WORKDIR /tmp
 
+ENV GNUPGHOME /tmp
+
 # https://www.mediawiki.org/keys/keys.txt
 RUN gpg --no-options --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
 
