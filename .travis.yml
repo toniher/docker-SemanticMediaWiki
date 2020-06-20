@@ -3,7 +3,7 @@ services:
 - docker
 language: bash
 script:
-- bash ./smw.sh
+- bash ./smw-build.sh
 
 
 
