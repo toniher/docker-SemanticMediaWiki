@@ -1,6 +1,6 @@
 {
 	"require": {
-		"mediawiki/semantic-media-wiki": "~3.1"
+		"mediawiki/semantic-bundle": "~3.1"
 	}
 
 }

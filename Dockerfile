@@ -82,7 +82,8 @@ RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && b
 
 # Addding extra stuff to LocalSettings. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
-enableSemantics( '${DOMAIN_NAME}' );\n " >> /var/www/w/LocalSettings.php ; fi
+enableSemantics( '${DOMAIN_NAME}' );\n\
+require_once __DIR__ . '/extensions/SemanticBundle/SemanticBundle.php';\n" >> /var/www/w/LocalSettings.php ; fi
 
 RUN cd /var/www/w; composer update --no-dev;
 
