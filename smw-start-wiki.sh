@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
+VARS=${1:-vars.env}
+
+source <(sed -E -n 's/[^#]+/export &/ p' $VARS)
 
 echo "Running wiki"
 
