@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-source <(sed -E -n 's/[^#]+/export &/ p' vars.env)
+VARS=${1:-vars.env}
+
+source <(sed -E -n 's/[^#]+/export &/ p' $VARS)
 
 docker rm -f $DB_CONTAINER
 docker rm -f $REDIS_CONTAINER
