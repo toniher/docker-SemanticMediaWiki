@@ -7,3 +7,7 @@ Repository for playing with Docker and Semantic MediaWiki  [![Build Status](http
 
 Different branches provide different version combinations
 
+Information is stored in vars.env (that can be modified and passed as argument to the scripts above)
+
+* Configuration files such as: LocalSettings.local.php or LocalSettings.redis.php are kept as -v mounted files ($CONF_PATH location)
+
