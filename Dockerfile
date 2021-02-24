@@ -1,7 +1,7 @@
 FROM toniher/nginx-php:nginx-1.16-php-7.3
 
-ARG MEDIAWIKI_VERSION=1.31
-ARG MEDIAWIKI_FULL_VERSION=1.31.10
+ARG MEDIAWIKI_VERSION=1.35
+ARG MEDIAWIKI_FULL_VERSION=1.35.1
 ARG DB_CONTAINER=db
 ARG PARSOID_CONTAINER=parsoid
 ARG MYSQL_HOST=127.0.0.1
@@ -20,7 +20,7 @@ ARG PROTOCOL=http://
 ARG MW_NEW=true
 
 # Forcing Invalidate cache
-ARG CACHE_INSTALL=2020-06-19
+ARG CACHE_INSTALL=2021-02-24
 
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
@@ -95,7 +95,7 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
-RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php 
+RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php
 
 # File LocalSettings.local.php
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
@@ -115,5 +115,3 @@ USER root
 RUN mkdir -p /run/php
 
 CMD ["/usr/bin/supervisord"]
-
-
