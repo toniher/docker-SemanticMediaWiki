@@ -3,7 +3,8 @@ services:
 - docker
 language: bash
 script:
-- bash ./smw-build.sh
+        - docker login -u="$DOCKERHUB_USER" -p="$DOCKERHUB_TOKEN"
+        - bash ./smw-build.sh
 
 
 
