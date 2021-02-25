@@ -90,7 +90,7 @@ RUN cd /var/www/w; composer update --no-dev;
 RUN cd /var/www/w; php maintenance/update.php
 
 # Update Semantic MediaWiki
-RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -ftpv
+RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -fpv
 RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -v
 
 RUN cd /var/www/w; php maintenance/runJobs.php
