@@ -1,6 +1,7 @@
 <?php
 
 # Cirrus configuration
+wfLoadExtension( 'Elastica' );
 wfLoadExtension( 'CirrusSearch' );
 
 # Configuration
