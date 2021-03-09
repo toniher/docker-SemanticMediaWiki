@@ -35,4 +35,4 @@ docker run --net=$NETWORK --name $PARSOID_CONTAINER -d -p 8142:8000 \
 docker exec $WIKI_CONTAINER php /var/www/w/maintenance/update.php
 docker exec $WIKI_CONTAINER php /var/www/w/maintenance/runJobs.php
 
-bash updateEmail.sh $VARS
+# bash updateEmail.sh $VARS
