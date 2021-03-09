@@ -16,12 +16,13 @@ fi
 
 docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images \
 ${LOCALSETTINGS_MOUNT} -v ${CONF_PATH}/LocalSettings.local.php:/var/www/w/LocalSettings.local.php -v ${CONF_PATH}/LocalSettings.redis.php:/var/www/w/LocalSettings.redis.php \
-#-v ${CONF_PATH}/logo.png:/var/www/w/logo.png \
-#-v ${SCRATCH}:/scratch \
-#-v ${CONF_PATH}/customizations:/var/www/w/customizations \
 -v ${CONF_PATH}/msmtprc:/etc/msmtprc \
 --name $WIKI_CONTAINER --network-alias=$DOMAIN_NAME -d $WIKI_IMAGE
 
+# Other potential params above
+#-v ${CONF_PATH}/logo.png:/var/www/w/logo.png \
+#-v ${SCRATCH}:/scratch \
+#-v ${CONF_PATH}/customizations:/var/www/w/customizations \
 
 echo "Running parsoid"
 
