@@ -83,6 +83,8 @@ RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php 
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
+# Cirrus Search
+RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh CirrusSearch $ENVEXT /var/www/w/extensions
 
 # Addding extra stuff to LocalSettings. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
@@ -109,6 +111,12 @@ include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php
 # Adding redis config. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ;  then echo "\n\
 include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php ; fi
+
+# Cirrus configuration
+# Adding Cirrus config. Only if new installation
+RUN if [ "$MW_NEW" = "true" ] ;  then echo "\n\
+include_once \"\$IP/LocalSettings.cirrus.php\"; " >> /var/www/w/LocalSettings.php ; fi
+
 
 # VOLUME image
 VOLUME /var/www/w/images
