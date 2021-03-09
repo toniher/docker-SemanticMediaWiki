@@ -25,9 +25,13 @@ ARG CACHE_INSTALL=2020-06-19
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg jq php-redis;
+    apt-get install -y gnupg jq php-redis msmtp;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
+
+# Copying mail conf 
+COPY 99-mail.ini /etc/php/7.3/fpm/conf.d/
+COPY 99-mail.ini /etc/php/7.3/cli/conf.d/
 
 # Starting processes
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

@@ -1,0 +1,3 @@
+account default
+host ${NETWORK_HOST}
+auto_from on
