@@ -83,7 +83,8 @@ RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php 
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
-# Cirrus Search
+# Elastica & Cirrus Search
+RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh Elastica $ENVEXT /var/www/w/extensions
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh CirrusSearch $ENVEXT /var/www/w/extensions
 
 # Addding extra stuff to LocalSettings. Only if new installation
