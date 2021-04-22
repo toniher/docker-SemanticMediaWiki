@@ -7,6 +7,7 @@ source <(sed -E -n 's/[^#]+/export &/ p' $VARS)
 # Moving this outside in case needed
 if [ -z ${MARIADB_BUILD_HOST+x} ]; then
   MARIADB_BUILD_HOST=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' $DB_CONTAINER`
+fi
 CACHE_INSTALL=`date +%Y-%m-%d-%H-%M`
 
 echo $MARIADB_BUILD_HOST
