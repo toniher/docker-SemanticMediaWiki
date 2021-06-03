@@ -1,7 +1,7 @@
-FROM toniher/nginx-php:nginx-1.16-php-7.3
+FROM toniher/nginx-php:nginx-1.18-php-7.4-sury
 
 ARG MEDIAWIKI_VERSION=1.35
-ARG MEDIAWIKI_FULL_VERSION=1.35.1
+ARG MEDIAWIKI_FULL_VERSION=1.35.2
 ARG DB_CONTAINER=db
 ARG PARSOID_CONTAINER=parsoid
 ARG MYSQL_HOST=127.0.0.1
@@ -25,7 +25,7 @@ ARG CACHE_INSTALL=2021-02-24
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg jq php-redis;
+    apt-get install -y gnupg jq php7.4-redis;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
