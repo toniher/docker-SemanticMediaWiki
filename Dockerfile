@@ -25,7 +25,7 @@ ARG CACHE_INSTALL=2020-06-19
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg jq php-redis msmtp;
+    apt-get install -y gnupg jq php7.4-redis msmtp;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
