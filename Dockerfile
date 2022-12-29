@@ -1,4 +1,4 @@
-FROM toniher/nginx-php:nginx-1.18-php-7.4-sury
+FROM toniher/nginx-php:nginx-1.23-php-7.4
 
 ARG MEDIAWIKI_VERSION=1.35
 ARG MEDIAWIKI_FULL_VERSION=1.35.9
