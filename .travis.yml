@@ -1,9 +1,0 @@
-services:
-- docker
-language: bash
-script:
-        - docker login -u="$DOCKERHUB_USER" -p="$DOCKERHUB_TOKEN"
-        - bash ./smw-build.sh
-
-
-
