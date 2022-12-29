@@ -1,7 +1,7 @@
 FROM toniher/nginx-php:nginx-1.18-php-7.4-sury
 
 ARG MEDIAWIKI_VERSION=1.35
-ARG MEDIAWIKI_FULL_VERSION=1.35.2
+ARG MEDIAWIKI_FULL_VERSION=1.35.9
 ARG DB_CONTAINER=db
 ARG PARSOID_CONTAINER=parsoid
 ARG MYSQL_HOST=127.0.0.1
@@ -20,7 +20,7 @@ ARG PROTOCOL=http://
 ARG MW_NEW=true
 
 # Forcing Invalidate cache
-ARG CACHE_INSTALL=2021-02-24
+ARG CACHE_INSTALL=2022-12-29
 
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
