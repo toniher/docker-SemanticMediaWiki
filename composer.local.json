@@ -1,7 +1,7 @@
 {
 	"require": {
 		"mediawiki/semantic-bundle": "~6.0",
-		"mediawiki/chameleon-skin": "~4.1"
+		"mediawiki/chameleon-skin": "~4.2"
 	}
 
 }
