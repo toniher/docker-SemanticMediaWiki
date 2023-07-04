@@ -26,7 +26,10 @@ $wgSessionsInObjectCache = true;
 $wgVirtualRestConfig['modules']['parsoid']['forwardCookies'] = true;
 
 wfLoadExtension( 'Bootstrap' );
-wfLoadSkin( 'chameleon' );
+# wfLoadSkin( 'chameleon' );
 
-$wgDefaultSkin='chameleon';
+# $wgDefaultSkin='chameleon';
+
+wfLoadSkin( 'Foreground' );
+$wgDefaultSkin='foreground';
 

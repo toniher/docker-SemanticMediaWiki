@@ -24,7 +24,11 @@ if [ -f ${CONF_PATH}/LocalSettings.local.php ]; then
 fi
 
 if [ -f ${CONF_PATH}/LocalSettings.redis.php ]; then
-	LOCALSETTINGS_LOCAL_MOUNT="-v ${CONF_PATH}/LocalSettings.redis.php:/var/www/w/LocalSettings.redis.php"
+	LOCALSETTINGS_REDIS_MOUNT="-v ${CONF_PATH}/LocalSettings.redis.php:/var/www/w/LocalSettings.redis.php"
+fi
+
+if [ -f ${CONF_PATH}/LocalSettings.cirrus.php ]; then
+	LOCALSETTINGS_CIRRUS_MOUNT="-v ${CONF_PATH}/LocalSettings.cirrus.php:/var/www/w/LocalSettings.cirrus.php"
 fi
 
 if [ -f ${CONF_PATH}/logo.png ]; then
@@ -44,7 +48,7 @@ if [ -f "${CONF_PATH}/msmtprc" ]; then
 fi
 
 docker run --net=$NETWORK -p $PORT:80 -v ${MW_IMAGES}:/var/www/w/images \
-${LOCALSETTINGS_MOUNT} ${LOCALSETTINGS_LOCAL_MOUNT} ${LOCALSETTINGS_REDIS_MOUNT} \
+${LOCALSETTINGS_MOUNT} ${LOCALSETTINGS_LOCAL_MOUNT} ${LOCALSETTINGS_REDIS_MOUNT} ${LOCALSETTINGS_CIRRUS_MOUNT} \
 ${LOGO_MOUNT} \
 ${SCRATCH_MOUNT} \
 ${CUSTOMIZATIONS_MOUNT} \
