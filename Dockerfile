@@ -88,7 +88,7 @@ RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && b
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh CirrusSearch $ENVEXT /var/www/w/extensions
 
 # Adding Foreground skin
-RUN bash /usr/local/bin/download-extension-git.sh Foreground v2.4.0 /var/www/w/skins/foreground 1 1
+RUN bash /usr/local/bin/download-extension-git.sh Foreground v2.4.0 /var/www/w/skins/Foreground 1 1
 
 # Addding extra stuff to LocalSettings. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
