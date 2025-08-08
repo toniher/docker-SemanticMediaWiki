@@ -1,7 +1,7 @@
-FROM toniher/nginx-php:nginx-1.23-php-8.1-sury
+FROM toniher/nginx-php:nginx-1.27-php-8.2
 
 ARG MEDIAWIKI_VERSION=1.39
-ARG MEDIAWIKI_FULL_VERSION=1.39.1
+ARG MEDIAWIKI_FULL_VERSION=1.39.13
 ARG DB_CONTAINER=db
 ARG PARSOID_CONTAINER=parsoid
 ARG MYSQL_HOST=127.0.0.1
@@ -20,12 +20,12 @@ ARG PROTOCOL=http://
 ARG MW_NEW=true
 
 # Forcing Invalidate cache
-ARG CACHE_INSTALL=2022-12-29
+ARG CACHE_INSTALL=2025-08-08
 
 RUN set -x; \
     apt-get update && apt-get -y upgrade;
 RUN set -x; \
-    apt-get install -y gnupg jq php8.1-redis;
+    apt-get install -y gnupg jq php8.2-redis;
 RUN set -x; \
     rm -rf /var/lib/apt/lists/*
 
