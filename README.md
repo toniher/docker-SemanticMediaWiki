@@ -1,3 +1,5 @@
+**WARNING** - Still not working
+
 Repository for playing with Docker and Semantic MediaWiki 
 
 * Parameters are stored in vars.env file ((that can be modified and passed as argument to the scripts below)
