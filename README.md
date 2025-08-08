@@ -1,4 +1,4 @@
-**WARNING** - Still not working
+**WARNING** - Used for personal purposes
 
 Repository for playing with Docker and Semantic MediaWiki 
 
