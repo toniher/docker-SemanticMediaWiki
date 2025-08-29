@@ -1,0 +1,6 @@
+build/
+tmp/
+.env
+LocalSettings.php
+LocalSettings.local.php
+LocalSettings.redis.php
