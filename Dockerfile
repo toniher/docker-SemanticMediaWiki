@@ -62,6 +62,9 @@ RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_
 
 COPY composer.local.json /var/www/w
 
+# Hack for handling possible LocalSettings.php
+COPY LocalSettings*php /tmp/
+
 RUN set -x; echo "Host is $MYSQL_HOST"
 
 RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php \
@@ -81,8 +84,18 @@ RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php 
 # VisualEditor extension
 RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
 
+USER root
+# If existing LocalSettings.php, copy it to the right place
+RUN if [ ! "$MW_NEW" = "true" ] && [ -f /tmp/LocalSettings.php ]; then \
+  # TODO: Need more processing here maybe
+  mv /tmp/LocalSettings*.php /var/www/w/; \
+  chown -R www-data:www-data /var/www/w/LocalSettings*.php; \
+  # rm -rf /tmp/LocalSettings*php; \
+fi
 
-# Addding extra stuff to LocalSettings. Only if new installation
+USER www-data
+
+# Adding extra stuff to LocalSettings. Only if new installation
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
 enableSemantics( '${DOMAIN_NAME}' );\n\
 require_once __DIR__ . '/extensions/SemanticBundle/SemanticBundle.php';\n" >> /var/www/w/LocalSettings.php ; fi
@@ -97,7 +110,7 @@ RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php 
 
 RUN cd /var/www/w; php maintenance/runJobs.php
 
-RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php
+RUN if [ "$MW_NEW" = "true" ] ; then sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php ; fi
 
 # File LocalSettings.local.php
 RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
@@ -117,3 +130,5 @@ USER root
 RUN mkdir -p /run/php
 
 CMD ["/usr/bin/supervisord"]
+
+HEALTHCHECK --interval=2m CMD curl -s "http://localhost/w/api.php?action=smwinfo&format=json" || exit 1
