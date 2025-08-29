@@ -81,9 +81,6 @@ RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php 
 		--lang "$MW_WIKILANG" \
 "${MW_WIKINAME}" "${MW_WIKIUSER}" ; fi
 
-# VisualEditor extension
-RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
-
 USER root
 # If existing LocalSettings.php, copy it to the right place
 RUN if [ ! "$MW_NEW" = "true" ] && [ -f /tmp/LocalSettings.php ]; then \

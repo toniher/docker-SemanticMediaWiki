@@ -1,7 +1,9 @@
 {
 	"require": {
 		"mediawiki/semantic-bundle": "~6.1",
-		"mediawiki/chameleon-skin": "~4.4"
+		"mediawiki/chameleon-skin": "~4.4",
+    "mediawiki/alink": "dev-master",
+    "mediawiki/aform": "dev-master"
 	}
 
 }
