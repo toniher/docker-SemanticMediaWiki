@@ -48,7 +48,9 @@ WORKDIR /tmp
 ENV GNUPGHOME /tmp
 
 # https://www.mediawiki.org/keys/keys.txt
-RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
+RUN curl -fsSL -o /tmp/mediawiki-keys.txt "https://www.mediawiki.org/keys/keys.txt" \
+    && gpg --no-tty --import /tmp/mediawiki-keys.txt \
+    && rm /tmp/mediawiki-keys.txt
 
 RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
 	set -x; \
