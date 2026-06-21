@@ -1,117 +1,95 @@
-FROM toniher/nginx-php:nginx-1.23-php-8.1-sury
+# syntax=docker/dockerfile:1.6
+#
+# docker-SemanticMediaWiki — stateless build.
+#
+# This image bakes only OS packages, MediaWiki source, and composer dependencies.
+# Database installation, schema updates, and LocalSettings.php generation happen
+# at run time via docker-entrypoint.sh.
 
-ARG MEDIAWIKI_VERSION=1.39
-ARG MEDIAWIKI_FULL_VERSION=1.39.1
+FROM toniher/nginx-php:nginx-1.29-php-8.4-sury
+
+ARG MEDIAWIKI_VERSION=1.43
+ARG MEDIAWIKI_FULL_VERSION=1.43.8
 ARG DB_CONTAINER=db
-ARG PARSOID_CONTAINER=parsoid
-ARG MYSQL_HOST=127.0.0.1
-ARG MYSQL_DATABASE=mediawiki
-ARG MYSQL_USER=mediawiki
-ARG MYSQL_PASSWORD=mediawiki
-ARG MYSQL_PREFIX=mw_
-ARG MW_PASSWORD=prova
-ARG MW_SCRIPTPATH=/w
-ARG MW_WIKILANG=en
-ARG MW_WIKINAME=Test
-ARG MW_WIKIUSER=WikiSysop
-ARG MW_EMAIL=hello@localhost
 ARG DOMAIN_NAME=localhost
-ARG PROTOCOL=http://
-ARG MW_NEW=true
 
-# Forcing Invalidate cache
-ARG CACHE_INSTALL=2022-12-29
-
-RUN set -x; \
-    apt-get update && apt-get -y upgrade;
-RUN set -x; \
-    apt-get install -y gnupg jq php8.1-redis;
-RUN set -x; \
+# OS packages (single layer, no `apt-get upgrade`)
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        gnupg \
+        jq \
+        php8.4-redis \
+        php8.4-zip; \
     rm -rf /var/lib/apt/lists/*
 
-# Starting processes
+# Supervisor and nginx config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Copy helpers
-COPY download-extension.sh /usr/local/bin/
-COPY download-extension-git.sh /usr/local/bin/
-
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
-# Adding extra domain name
 RUN sed -i "s/localhost/localhost $DOMAIN_NAME/" /etc/nginx/conf.d/default.conf
 
-RUN mkdir -p /var/www/w; chown www-data:www-data /var/www/w
+# Extension / skin download helpers
+COPY download-extension.sh /usr/local/bin/
+COPY download-extension-git.sh /usr/local/bin/
+COPY download-extension-github.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/download-extension.sh \
+             /usr/local/bin/download-extension-git.sh \
+             /usr/local/bin/download-extension-github.sh
+
+# Wiki working directory + php-fpm runtime dir
+RUN set -eux; \
+    mkdir -p /var/www/w /run/php; \
+    chown www-data:www-data /var/www/w
+
 USER www-data
-
 WORKDIR /tmp
+ENV GNUPGHOME=/tmp
 
-ENV GNUPGHOME /tmp
-
-# https://www.mediawiki.org/keys/keys.txt
-RUN gpg --no-tty --fetch-keys "https://www.mediawiki.org/keys/keys.txt"
-
-RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
-	set -x; \
-	curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
-	&& curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig \
-	&& gpg --verify mediawiki.tar.gz.sig \
-	&& tar -xf mediawiki.tar.gz -C /var/www/w --strip-components=1 \
-	&& rm -f mediawiki*
-
-COPY composer.local.json /var/www/w
-
-RUN set -x; echo "Host is $MYSQL_HOST"
-
-RUN if [ "$MW_NEW" = "true" ] ; then cd /var/www/w; php maintenance/install.php \
-		--dbname "$MYSQL_DATABASE" \
-		--dbpass "$MYSQL_PASSWORD" \
-		--dbserver "$MYSQL_HOST" \
-		--dbtype mysql \
-		--dbprefix "$MYSQL_PREFIX" \
-		--dbuser "$MYSQL_USER" \
-		--installdbpass "$MYSQL_PASSWORD" \
-		--installdbuser "$MYSQL_USER" \
-		--pass "$MW_PASSWORD" \
-		--scriptpath "$MW_SCRIPTPATH" \
-		--lang "$MW_WIKILANG" \
-"${MW_WIKINAME}" "${MW_WIKIUSER}" ; fi
-
-# VisualEditor extension
-RUN ENVEXT=$MEDIAWIKI_VERSION && ENVEXT=$(echo $ENVEXT | sed -r "s/\./_/g") && bash /usr/local/bin/download-extension.sh VisualEditor $ENVEXT /var/www/w/extensions
-
-
-# Addding extra stuff to LocalSettings. Only if new installation
-RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
-enableSemantics( '${DOMAIN_NAME}' );\n\
-require_once __DIR__ . '/extensions/SemanticBundle/SemanticBundle.php';\n" >> /var/www/w/LocalSettings.php ; fi
-
-RUN cd /var/www/w; composer update --no-dev;
-
-RUN cd /var/www/w; php maintenance/update.php
-
-# Update Semantic MediaWiki
-RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -fpv
-RUN cd /var/www/w; php extensions/SemanticMediaWiki/maintenance/rebuildData.php -v
-
-RUN cd /var/www/w; php maintenance/runJobs.php
-
-RUN sed -i "s/$MYSQL_HOST/$DB_CONTAINER/" /var/www/w/LocalSettings.php
-
-# File LocalSettings.local.php
-RUN if [ "$MW_NEW" = "true" ] ; then echo "\n\
-include_once \"\$IP/LocalSettings.local.php\"; " >> /var/www/w/LocalSettings.php ; fi
-
-# Redis configuration
-# Adding redis config. Only if new installation
-RUN if [ "$MW_NEW" = "true" ] ;  then echo "\n\
-include_once \"\$IP/LocalSettings.redis.php\"; " >> /var/www/w/LocalSettings.php ; fi
-
-# VOLUME image
-VOLUME /var/www/w/images
+# MediaWiki release (signature verified against the upstream keyring)
+RUN set -eux; \
+    curl -fsSL -o /tmp/mediawiki-keys.txt https://www.mediawiki.org/keys/keys.txt; \
+    gpg --no-tty --import /tmp/mediawiki-keys.txt; \
+    rm /tmp/mediawiki-keys.txt; \
+    MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_VERSION}/mediawiki-${MEDIAWIKI_FULL_VERSION}.tar.gz"; \
+    curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz; \
+    curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig; \
+    gpg --verify mediawiki.tar.gz.sig; \
+    tar -xf mediawiki.tar.gz -C /var/www/w --strip-components=1; \
+    rm -f mediawiki*
 
 WORKDIR /var/www/w
 
-USER root
-RUN mkdir -p /run/php
+# Composer-managed extensions. Commit composer.lock for reproducible installs.
+# Generate one with:
+#   docker run --rm -v $(pwd):/work -w /work composer:2 \
+#       composer update --no-dev --no-interaction --prefer-dist
+COPY --chown=www-data:www-data composer.local.json /var/www/w/composer.local.json
+COPY --chown=www-data:www-data composer.loc[k] /var/www/w/composer.lock
 
+RUN set -eux; \
+    if [ -s composer.lock ]; then \
+        composer install --no-dev --no-interaction --prefer-dist; \
+    else \
+        echo "WARNING: composer.lock is missing; falling back to composer update." >&2; \
+        composer update --no-dev --no-interaction --prefer-dist; \
+    fi
+
+USER root
+
+# Runtime entrypoint: installs / updates MediaWiki against the linked DB,
+# then exec's the CMD (supervisord -> nginx + php-fpm).
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Uploaded files live on a named volume; LocalSettings.php is persisted on
+# a separate volume populated by the entrypoint on first boot.
+VOLUME /var/www/w/images
+VOLUME /var/www/w/config
+
+WORKDIR /var/www/w
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/usr/bin/supervisord"]
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -fsS "http://localhost/w/api.php?action=query&format=json" >/dev/null || exit 1

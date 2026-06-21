@@ -1,0 +1,90 @@
+name: smw-wiki
+
+# Development compose — named volumes, local network.
+# Usage:
+#   cp example.env .env   # fill in secrets
+#   docker compose up --build
+#
+# For production: docker compose -f compose.yaml -f compose.prod.yaml up --build
+
+services:
+  db:
+    image: mariadb:${MARIADB_TAG:-10.11}
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MYSQL_DATABASE}
+      MARIADB_USER: ${MYSQL_USER}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mariadb-custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: valkey/valkey:${REDIS_TAG:-8}
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  wiki:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MEDIAWIKI_VERSION: ${MEDIAWIKI_VERSION}
+        MEDIAWIKI_FULL_VERSION: ${MEDIAWIKI_FULL_VERSION}
+        DOMAIN_NAME: ${DOMAIN_NAME:-localhost}
+    pull_policy: build
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_PREFIX: ${MYSQL_PREFIX:-mw_}
+      MW_PASSWORD: ${MW_PASSWORD}
+      MW_SCRIPTPATH: ${MW_SCRIPTPATH:-/w}
+      MW_WIKINAME: ${MW_WIKINAME}
+      MW_WIKIUSER: ${MW_WIKIUSER}
+      MW_EMAIL: ${MW_EMAIL}
+      MW_WIKILANG: ${MW_WIKILANG:-en}
+      DOMAIN_NAME: ${DOMAIN_NAME:-localhost}
+    ports:
+      - "${PORT:-10081}:80"
+    volumes:
+      - mw_images:/var/www/w/images
+      - mw_config:/var/www/w/config
+      - ./LocalSettings.local.php:/var/www/w/LocalSettings.local.php:ro
+      - ./LocalSettings.redis.php:/var/www/w/LocalSettings.redis.php:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS 'http://localhost/w/api.php?action=query&format=json' >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  db_data:
+  redis_data:
+  mw_images:
+  mw_config:
+
+networks:
+  default:
+    name: ${NETWORK:-smwnet}
