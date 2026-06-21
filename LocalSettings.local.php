@@ -3,7 +3,7 @@
 #  Local configuration for MediaWiki
 
 ini_set( 'max_execution_time', 1000 );
-ini_set('memory_limit', '-1'); 
+ini_set('memory_limit', '-1');
 
 $wgEnableUploads = true;
 
@@ -17,16 +17,12 @@ $wgDefaultUserOptions['usebetatoolbar'] = 1; // user option provided by WikiEdit
 
 wfLoadExtension('VisualEditor');
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
-$wgVirtualRestConfig['modules']['parsoid'] = array(
-    'url' => 'http://parsoid:8000',
-    'domain' => 'localhost',
-    'prefix' => ''
-);
-$wgSessionsInObjectCache = true;
-$wgVirtualRestConfig['modules']['parsoid']['forwardCookies'] = true;
 
 wfLoadExtension( 'Bootstrap' );
 wfLoadSkin( 'chameleon' );
 
 $wgDefaultSkin='chameleon';
 
+// SemanticMediaWiki — pass the wiki's public hostname (no scheme).
+// Reads DOMAIN_NAME env var set on the container; falls back to 'localhost'.
+enableSemantics( getenv('DOMAIN_NAME') ?: 'localhost' );

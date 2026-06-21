@@ -1,0 +1,28 @@
+# Production overrides — bind-mount volumes, external network.
+# Usage:
+#   docker compose -f compose.yaml -f compose.prod.yaml up --build -d
+#
+# Required extra vars in .env:
+#   DB_DATA_DIR   — host path for MariaDB data  (e.g. /srv/smw/db)
+#   MW_IMAGES_DIR — host path for wiki images   (e.g. /srv/smw/images)
+
+services:
+  db:
+    volumes:
+      - ${DB_DATA_DIR}:/var/lib/mysql
+      - ./mariadb-custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
+
+  wiki:
+    volumes:
+      - ${MW_IMAGES_DIR}:/var/www/w/images
+      - mw_config:/var/www/w/config
+      - ./LocalSettings.local.php:/var/www/w/LocalSettings.local.php:ro
+      - ./LocalSettings.redis.php:/var/www/w/LocalSettings.redis.php:ro
+
+volumes:
+  db_data: null   # disable named volume — bind mount takes over
+
+networks:
+  default:
+    name: ${NETWORK:-smwnet}
+    external: true
