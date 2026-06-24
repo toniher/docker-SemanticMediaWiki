@@ -33,7 +33,12 @@ wait_for_db() {
   [ -n "${MYSQL_HOST:-}" ] || return 0
   echo "Waiting for ${MYSQL_HOST} to accept connections..."
   i=0
-  until php -r "new PDO('mysql:host=${MYSQL_HOST};dbname=${MYSQL_DATABASE}','${MYSQL_USER}','${MYSQL_PASSWORD}');" 2>/dev/null; do
+  # Pass connection params through the environment (read with getenv) rather
+  # than interpolating them into the PHP source string. This keeps passwords
+  # containing quotes/backslashes from breaking the script or injecting code.
+  until MYSQL_HOST="$MYSQL_HOST" MYSQL_DATABASE="$MYSQL_DATABASE" \
+        MYSQL_USER="$MYSQL_USER" MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+        php -r 'new PDO("mysql:host=".getenv("MYSQL_HOST").";dbname=".getenv("MYSQL_DATABASE"), getenv("MYSQL_USER"), getenv("MYSQL_PASSWORD"));' 2>/dev/null; do
     i=$((i + 1))
     if [ "$i" -gt 60 ]; then
       echo "Timed out waiting for ${MYSQL_HOST}" >&2
